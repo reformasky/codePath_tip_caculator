@@ -15,25 +15,34 @@ class ViewController: UIViewController {
     @IBOutlet weak var tipLabel: UILabel!
     @IBOutlet weak var TotalLabel: UILabel!
     @IBOutlet var tapRecognizer: UITapGestureRecognizer!
+    let defaults = UserDefaults.standard;
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
         loadView()
-
-        // Do any additional setup after loading the view, typically from a nib.
+        billNumber.text = String("")
+        let setTime = defaults.object(forKey: "setTime")
+        print(setTime ?? "not there")
+        if (setTime != nil && NSDate().compare(setTime as! Date).rawValue < 0) {
+            billNumber.text = defaults.string(forKey: "bill");
+        } else {
+            defaults.removeObject(forKey: "setTime")
+            defaults.removeObject(forKey: "bill")
+        }
+        calculateTip(billNumber)
         
         view.addGestureRecognizer(tapRecognizer)
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
 
 
     @IBAction func onTap(_ sender: UITapGestureRecognizer) {
         print("hello")
-        view.endEditing(true)
+        //view.endEditing(true)
     }
     
 
@@ -45,11 +54,14 @@ class ViewController: UIViewController {
         let total = bill + tip;
         tipLabel.text = String(format: "$%.2f", tip);
         TotalLabel.text = String(format: "$%.2f", total);
+        defaults.set(billNumber.text, forKey: "bill")
+        defaults.set(NSDate().addingTimeInterval(TimeInterval(100 )), forKey:"setTime")
+
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        let defaults = UserDefaults.standard;
+        billNumber.becomeFirstResponder();
         tipPercLabel.selectedSegmentIndex = defaults.integer(forKey: "defaultPerc");
         print(tipPercLabel.selectedSegmentIndex)
         print("view will appear")
