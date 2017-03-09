@@ -11,10 +11,11 @@ import UIKit
 class SettingsViewController: UIViewController {
 
     @IBOutlet weak var tipPercLabel: UISegmentedControl!
-    
+    let defaults = UserDefaults.standard;
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        tipPercLabel.selectedSegmentIndex = defaults.integer(forKey:"defaultPerc")
 
         // Do any additional setup after loading the view.
     }
@@ -37,7 +38,6 @@ class SettingsViewController: UIViewController {
     
     @IBAction func calculateTip(_ sender: AnyObject) {
         print("changed")
-        let defaults = UserDefaults.standard;
         defaults.set(tipPercLabel.selectedSegmentIndex, forKey:"defaultPerc")
         defaults.synchronize()
     }

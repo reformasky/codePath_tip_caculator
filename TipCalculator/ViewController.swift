@@ -21,6 +21,9 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         loadView()
+       // tipPercLabel.selectedSegmentIndex = defaults.integer(forKey: "defaultPerc")
+        print(tipPercLabel.selectedSegmentIndex)
+        NotificationCenter.default.addObserver(self, selector:#selector(ViewController.appWillTerminate) , name: NSNotification.Name.UIApplicationWillTerminate, object: nil)
         billNumber.text = String("")
         let setTime = defaults.object(forKey: "setTime")
         print(setTime ?? "not there")
@@ -30,7 +33,7 @@ class ViewController: UIViewController {
             defaults.removeObject(forKey: "setTime")
             defaults.removeObject(forKey: "bill")
         }
-        calculateTip(billNumber)
+        calculate()
         
         view.addGestureRecognizer(tapRecognizer)
     }
@@ -45,18 +48,26 @@ class ViewController: UIViewController {
         //view.endEditing(true)
     }
     
-
-    
-    @IBAction func calculateTip(_ sender: AnyObject) {
+    func calculate() {
         let tipPrecs = [0.15, 0.18, 0.20];
         let bill = Double(billNumber.text!) ?? 0;
         let tip = bill * tipPrecs[tipPercLabel.selectedSegmentIndex];
         let total = bill + tip;
         tipLabel.text = String(format: "$%.2f", tip);
         TotalLabel.text = String(format: "$%.2f", total);
-        defaults.set(billNumber.text, forKey: "bill")
-        defaults.set(NSDate().addingTimeInterval(TimeInterval(100 )), forKey:"setTime")
+       
+        
 
+    }
+    
+    @IBAction func billAmountInput(_ sender: AnyObject) {
+        calculate()
+
+    }
+
+    @IBAction func tipPercChange(_ sender: AnyObject) {
+        calculate()
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -65,6 +76,11 @@ class ViewController: UIViewController {
         tipPercLabel.selectedSegmentIndex = defaults.integer(forKey: "defaultPerc");
         print(tipPercLabel.selectedSegmentIndex)
         print("view will appear")
+    }
+    
+    func appWillTerminate() {
+        defaults.set(billNumber.text, forKey: "bill")
+        defaults.set(NSDate().addingTimeInterval(TimeInterval(100 )), forKey:"setTime")
     }
 }
 
